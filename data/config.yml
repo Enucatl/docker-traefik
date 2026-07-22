@@ -99,7 +99,7 @@ http:
     security-headers:
       headers:
         contentTypeNosniff: true
-        referrerPolicy: no-referrer
+        referrerPolicy: same-origin
         stsSeconds: 31536000
 
     secured:
