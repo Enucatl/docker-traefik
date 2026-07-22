@@ -1,4 +1,8 @@
-accesslog: false
+accessLog:
+  format: json
+  fields:
+    queryParameters:
+      defaultMode: drop
 api:
   dashboard: true
   insecure: false
@@ -12,11 +16,13 @@ entryPoints:
     http:
       middlewares:
         - public-rate-limit@file
+        - security-headers@file
   https:
     address: ":443"
     http:
       middlewares:
         - public-rate-limit@file
+        - security-headers@file
   ping:
     address: ":8082"
   protonmail-bridge-imap:
@@ -29,7 +35,7 @@ entryPoints:
     address: ":8000"
 
 log:
-  level: DEBUG
+  level: INFO
   format: json
 
 global:

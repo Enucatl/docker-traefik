@@ -1,16 +1,9 @@
 tls:
   options:
     default:
-      minVersion: VersionTLS12
-      cipherSuites:
-        - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
-        - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
-        - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
-        - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
-        - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+      minVersion: VersionTLS13
     mtls:
-      minVersion: VersionTLS12
+      minVersion: VersionTLS13
       clientAuth:
         caFiles:
           - /run/mtls-ca/docker-root-ca.crt
@@ -26,21 +19,6 @@ tls:
 http:
 
   routers:
-
-    block-probe-paths-http:
-      rule: PathRegexp(`(?i)^/(?:\.env|\.git|wp-admin|phpmyadmin)(?:$|/|[._-])`)
-      priority: 100000
-      service: noop@internal
-      entryPoints:
-        - "http"
-
-    block-probe-paths-https:
-      rule: PathRegexp(`(?i)^/(?:\.env|\.git|wp-admin|phpmyadmin)(?:$|/|[._-])`)
-      priority: 100000
-      service: noop@internal
-      entryPoints:
-        - "https"
-      tls: {}
 
     http-to-https:
       rule: PathPrefix(`/`)
@@ -72,6 +50,8 @@ http:
       rule: Host(`traefik.docker.home.arpa`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       service: api@internal
       middlewares:
+        - admin-rate-limit
+        - authelia@docker
         - secured
       entryPoints:
         - "https"
@@ -109,6 +89,18 @@ http:
         average: 1000
         period: 1m
         burst: 100
+
+    admin-rate-limit:
+      rateLimit:
+        average: 60
+        period: 1m
+        burst: 20
+
+    security-headers:
+      headers:
+        contentTypeNosniff: true
+        referrerPolicy: no-referrer
+        stsSeconds: 31536000
 
     secured:
       chain:
