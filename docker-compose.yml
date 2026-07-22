@@ -57,13 +57,6 @@ services:
       - IPV6_LAN_SUBNET
       - IPV6_TRUSTED_WIFI_SUBNET
       - IPV6_WG_SUBNET
-    command:
-      # HTTP Entrypoint
-      - "--entrypoints.http.forwardedHeaders.trustedIPs=${LAN_SUBNET},${TRUSTED_WIFI_SUBNET},${WG_SUBNET},172.17.0.0/16,${IPV6_LAN_SUBNET},${IPV6_TRUSTED_WIFI_SUBNET},${IPV6_WG_SUBNET}"
-      - "--entrypoints.http.proxyProtocol.trustedIPs=${LAN_SUBNET},${TRUSTED_WIFI_SUBNET},${WG_SUBNET},172.17.0.0/16,${IPV6_LAN_SUBNET},${IPV6_TRUSTED_WIFI_SUBNET},${IPV6_WG_SUBNET}"
-      # HTTPS Entrypoint
-      - "--entrypoints.https.forwardedHeaders.trustedIPs=${LAN_SUBNET},${TRUSTED_WIFI_SUBNET},${WG_SUBNET},172.17.0.0/16,${IPV6_LAN_SUBNET},${IPV6_TRUSTED_WIFI_SUBNET},${IPV6_WG_SUBNET}"
-      - "--entrypoints.https.proxyProtocol.trustedIPs=${LAN_SUBNET},${TRUSTED_WIFI_SUBNET},${WG_SUBNET},172.17.0.0/16,${IPV6_LAN_SUBNET},${IPV6_TRUSTED_WIFI_SUBNET},${IPV6_WG_SUBNET}"
     labels:
       - "checkmk_monitor=true"
 

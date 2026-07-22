@@ -14,12 +14,14 @@ entryPoints:
   http:
     address: ":80"
     http:
+      underscoreHeadersStrategy: reject
       middlewares:
         - public-rate-limit@file
         - security-headers@file
   https:
     address: ":443"
     http:
+      underscoreHeadersStrategy: reject
       middlewares:
         - public-rate-limit@file
         - security-headers@file
@@ -50,6 +52,7 @@ providers:
     directory: /etc/traefik
     watch: true
 
-# disable upstream HTTPS certificate checks (https > https)
 serversTransport:
-    insecureSkipVerify: true
+  rootCAs:
+    - /run/mtls-ca/docker-root-ca.crt
+    - /run/mtls-ca/docker-intermediate-ca.crt

@@ -31,18 +31,15 @@ adds the forwarding headers sent to backends itself.
 
 `forwardedHeaders.trustedIPs` is only needed for the addresses of HTTP reverse
 proxies that deliberately add `X-Forwarded-*`. `proxyProtocol.trustedIPs` is
-only needed for L4 load balancers configured to emit PROXY protocol. Trusting
-ordinary client subnets allows those clients to supply a false source address
-to logs and address-aware middleware. Remove both settings unless an upstream
-proxy is identified, then trust only that proxy's exact address.
+only needed for L4 load balancers configured to emit PROXY protocol. Neither
+is enabled. If an upstream proxy is added, trust only that proxy's exact
+address.
 
 ## Backend TLS
 
-The global `serversTransport.insecureSkipVerify` appears to support the UniFi
-service, which sends Traefik to its HTTPS port 8443 and commonly uses a private
-certificate. Replace the global exception with a UniFi-specific
-`serversTransport` containing the UniFi CA and expected server name. Removing
-the global setting before that change would break UniFi.
+Backend certificate verification is enabled globally using the internal root
+and intermediate CA. HTTPS backends must present a certificate whose chain and
+server name Traefik can verify. Never restore a global verification bypass.
 
 ## Deferred decisions
 
