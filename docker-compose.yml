@@ -39,6 +39,7 @@ services:
       socket-proxy:
         condition: service_started
     networks:
+      - authelia_proxy
       - traefik_proxy
     ports:
       - 80:80
@@ -61,6 +62,8 @@ services:
       - "checkmk_monitor=true"
 
 networks:
+  authelia_proxy:
+    external: true
   traefik_proxy:
     external: true
 
