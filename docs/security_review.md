@@ -5,7 +5,7 @@
 Infrastructure services that must operate independently of Traefik retain their
 direct host port mappings. Restrict those ports at the host or router firewall
 to the minimum required source VLANs and WireGuard subnet. In particular,
-review PostgreSQL, Vault, Checkmk, qBittorrent, LDAP/Kerberos, SMB/NFS, and
+review PostgreSQL, Vault, qBittorrent, LDAP/Kerberos, SMB/NFS, and
 Proton Mail Bridge; do not rely on Traefik middleware to protect them.
 
 Apply equivalent IPv4 and IPv6 rules and verify them from an untrusted VLAN.

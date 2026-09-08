@@ -33,8 +33,6 @@ entryPoints:
     address: ":1125"
   postgres:
     address: ":5432"
-  checkmk:
-    address: ":8000"
 
 log:
   level: INFO
