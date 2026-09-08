@@ -4,7 +4,7 @@ services:
     extends:
       file: ../compose-security-baseline/hardening.yml
       service: hardened-tiny
-    image: 11notes/socket-proxy@sha256:6806f9b3cfe64325ae2dc967381412e415d868c9542753962fd2e73f4f9686f1
+    image: 11notes/socket-proxy:2.1.7@sha256:6806f9b3cfe64325ae2dc967381412e415d868c9542753962fd2e73f4f9686f1
     network_mode: none
     healthcheck:
       disable: true
@@ -54,9 +54,11 @@ services:
     environment:
       - LAN_SUBNET
       - TRUSTED_WIFI_SUBNET
+      - CORTEX_SUBNET
       - WG_SUBNET
       - IPV6_LAN_SUBNET
       - IPV6_TRUSTED_WIFI_SUBNET
+      - IPV6_CORTEX_SUBNET
       - IPV6_WG_SUBNET
     labels:
       - "checkmk_monitor=true"
