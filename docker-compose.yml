@@ -35,6 +35,12 @@ services:
     image: traefik:latest
     cpu_shares: 2048
     user: "1000:1000"
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     depends_on:
       socket-proxy:
         condition: service_started
