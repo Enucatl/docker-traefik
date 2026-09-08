@@ -60,8 +60,6 @@ services:
       - IPV6_TRUSTED_WIFI_SUBNET
       - IPV6_CORTEX_SUBNET
       - IPV6_WG_SUBNET
-    labels:
-      - "checkmk_monitor=true"
 
 networks:
   authelia_proxy:
