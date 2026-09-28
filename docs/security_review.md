@@ -12,6 +12,12 @@ Apply equivalent IPv4 and IPv6 rules and verify them from an untrusted VLAN.
 
 ## Traefik network
 
+Browser Use controller and noVNC use the dedicated `browser_use_proxy` network,
+owned by this Compose project. Only those two backends and Traefik join it;
+unrelated services must not join because the controller trusts identity headers
+from reachable peers. Docker allocates its subnet. Start this stack before
+Browser Use, which declares the network external.
+
 Only Traefik and processes receiving traffic from it join `traefik_proxy`.
 Worker, CLI, evaluation, and webhook processes use internal or dedicated
 egress networks instead. The Send Bills scheduler uses its `host_egress`

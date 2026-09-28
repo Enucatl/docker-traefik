@@ -46,6 +46,7 @@ services:
         condition: service_started
     networks:
       - authelia_proxy
+      - browser_use_proxy
       - traefik_proxy
       - loki_proxy
     ports:
@@ -69,6 +70,9 @@ services:
       - IPV6_WG_SUBNET
 
 networks:
+  # Dedicated Browser Use ingress; Docker allocates the subnet automatically.
+  browser_use_proxy:
+    name: browser_use_proxy
   authelia_proxy:
     external: true
   traefik_proxy:
