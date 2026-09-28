@@ -37,15 +37,6 @@ http:
         - "https"
       tls: {}
 
-    salt-box:
-      rule: Host(`salt-box.docker.home.arpa`)
-      service: salt-box
-      middlewares:
-        - secured
-      entryPoints:
-        - "https"
-      tls: {}
-
     traefik:
       rule: Host(`traefik.docker.home.arpa`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       service: api@internal
@@ -57,13 +48,6 @@ http:
         - "https"
       tls: {}
 
-
-  services:
-
-    salt-box:
-      loadBalancer:
-        servers:
-          - url: "http://salt.box/"
 
   middlewares:
 

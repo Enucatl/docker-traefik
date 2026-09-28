@@ -47,6 +47,7 @@ services:
     networks:
       - authelia_proxy
       - traefik_proxy
+      - loki_proxy
     ports:
       - 80:80
       - 443:443
@@ -71,6 +72,8 @@ networks:
   authelia_proxy:
     external: true
   traefik_proxy:
+    external: true
+  loki_proxy:
     external: true
 
 volumes:
