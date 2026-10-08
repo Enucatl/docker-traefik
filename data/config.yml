@@ -33,6 +33,8 @@ http:
       rule: PathPrefix(`/`)
       priority: 1
       service: noop@internal
+      middlewares:
+        - public-rate-limit
       entryPoints:
         - "https"
       tls: {}
@@ -76,6 +78,12 @@ http:
         period: 1m
         burst: 100
 
+    opengrind-demo-rate-limit:
+      rateLimit:
+        average: 1000
+        period: 1m
+        burst: 1000
+
     admin-rate-limit:
       rateLimit:
         average: 60
@@ -91,5 +99,6 @@ http:
     secured:
       chain:
         middlewares:
+        - public-rate-limit
         - https-redirectscheme
         - default-allowlist

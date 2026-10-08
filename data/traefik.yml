@@ -23,7 +23,6 @@ entryPoints:
     http:
       underscoreHeadersStrategy: reject
       middlewares:
-        - public-rate-limit@file
         - security-headers@file
   ping:
     address: ":8082"
