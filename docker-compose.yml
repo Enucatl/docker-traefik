@@ -55,7 +55,8 @@ services:
       - 127.0.0.1:8082:8082
     volumes:
       - ./data:/etc/traefik:ro
-      - /usr/local/share/ca-certificates/atlas-infrastructure.crt:/run/mtls-ca/atlas-root-ca.crt:ro
+      - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro
+      - /etc/ipa/ca.crt:/etc/ipa/ca.crt:ro
       - socket-proxy.run:/var/run
 
     environment:

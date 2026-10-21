@@ -5,8 +5,9 @@ tls:
     mtls:
       minVersion: VersionTLS13
       clientAuth:
+        # Client identities must be issued by IPA, not public system CAs.
         caFiles:
-        - /run/mtls-ca/atlas-root-ca.crt
+        - /etc/ipa/ca.crt
         clientAuthType: RequireAndVerifyClientCert
   stores:
     default:

@@ -51,4 +51,4 @@ providers:
 
 serversTransport:
   rootCAs:
-    - /run/mtls-ca/atlas-root-ca.crt
+    - /etc/ssl/certs/ca-certificates.crt

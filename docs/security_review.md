@@ -43,9 +43,12 @@ address.
 
 ## Backend TLS
 
-Backend certificate verification is enabled globally using the internal root
-and intermediate CA. HTTPS backends must present a certificate whose chain and
+Backend certificate verification is enabled globally using the host's standard
+CA bundle. HTTPS backends must present a certificate whose chain and
 server name Traefik can verify. Never restore a global verification bypass.
+
+Inbound mTLS trusts only the IPA CA at `/etc/ipa/ca.crt`, keeping client
+authentication restricted to infrastructure identities.
 
 ## Deferred decisions
 
