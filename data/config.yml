@@ -6,96 +6,83 @@ tls:
       minVersion: VersionTLS13
       clientAuth:
         caFiles:
-          - /run/mtls-ca/docker-root-ca.crt
-          - /run/mtls-ca/docker-intermediate-ca.crt
+        - /run/mtls-ca/atlas-root-ca.crt
         clientAuthType: RequireAndVerifyClientCert
   stores:
     default:
       defaultCertificate:
-        certFile: /etc/traefik/certs/docker_fullchain.pem
-        keyFile: /etc/traefik/certs/docker_key.pem
-
-
+        certFile: /etc/traefik/certs/atlas_fullchain.pem
+        keyFile: /etc/traefik/certs/atlas_key.pem
 http:
-
   routers:
-
     http-to-https:
       rule: PathPrefix(`/`)
       priority: 99999
       service: noop@internal
       middlewares:
-        - https-redirectscheme
+      - https-redirectscheme
       entryPoints:
-        - "http"
-
+      - http
     unknown-hosts:
       rule: PathPrefix(`/`)
       priority: 1
       service: noop@internal
       middlewares:
-        - public-rate-limit
+      - public-rate-limit
       entryPoints:
-        - "https"
+      - https
       tls: {}
-
     traefik:
-      rule: Host(`traefik.docker.home.arpa`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      rule: Host(`traefik.atlas.home.arpa`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       service: api@internal
       middlewares:
-        - admin-rate-limit
-        - authelia@docker
-        - secured
+      - admin-rate-limit
+      - authelia@docker
+      - secured
       entryPoints:
-        - "https"
+      - https
       tls: {}
-
-
   middlewares:
-
     https-redirectscheme:
       redirectScheme:
         scheme: https
         permanent: true
-
     default-allowlist:
       ipAllowList:
         sourceRange:
-          - '{{ env "LAN_SUBNET" }}'
-          - '{{ env "TRUSTED_WIFI_SUBNET" }}'
-          - '{{ env "CORTEX_SUBNET" }}'
-          - '{{ env "WG_SUBNET" }}'
-          # Matches the Docker default address pool from /etc/docker/daemon.json.
-          - '172.16.0.0/12'
-          - '{{ env "IPV6_LAN_SUBNET" }}'
-          - '{{ env "IPV6_TRUSTED_WIFI_SUBNET" }}'
-          - '{{ env "IPV6_CORTEX_SUBNET" }}'
-          - '{{ env "IPV6_WG_SUBNET" }}'
-
+        - '{{ env "LAN_SUBNET" }}'
+        - '{{ env "TRUSTED_WIFI_SUBNET" }}'
+        - '{{ env "CORTEX_SUBNET" }}'
+        - '{{ env "WG_SUBNET" }}'
+        - 172.16.0.0/12
+        - '{{ env "IPV6_LAN_SUBNET" }}'
+        - '{{ env "IPV6_TRUSTED_WIFI_SUBNET" }}'
+        - '{{ env "IPV6_CORTEX_SUBNET" }}'
+        - '{{ env "IPV6_WG_SUBNET" }}'
+        - fd6b:d722:1738:0::/64
+        - fd6b:d722:1738:a::/64
+        - fd6b:d722:1738:28::/64
+        - fd6b:d722:1738:c8::/64
     public-rate-limit:
       rateLimit:
         average: 1000
         period: 1m
         burst: 100
-
     opengrind-demo-rate-limit:
       rateLimit:
         average: 1000
         period: 1m
         burst: 1000
-
     admin-rate-limit:
       rateLimit:
         average: 60
         period: 1m
         burst: 20
-
     security-headers:
       headers:
         contentTypeNosniff: true
         referrerPolicy: same-origin
         stsSeconds: 31536000
-
     secured:
       chain:
         middlewares:

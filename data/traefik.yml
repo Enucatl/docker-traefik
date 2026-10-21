@@ -51,5 +51,4 @@ providers:
 
 serversTransport:
   rootCAs:
-    - /run/mtls-ca/docker-root-ca.crt
-    - /run/mtls-ca/docker-intermediate-ca.crt
+    - /run/mtls-ca/atlas-root-ca.crt
