@@ -45,10 +45,21 @@ services:
       socket-proxy:
         condition: service_started
     networks:
-      - authelia_proxy
-      - browser_use_proxy
-      - traefik_proxy
-      - loki_proxy
+      - airflow_traefik
+      - authelia_traefik
+      - backrest_traefik
+      - beszel_traefik
+      - browser-use_traefik
+      - grafana-loki_traefik
+      - grindr-api-dev-tool_traefik
+      - infra_traefik
+      - jellyfin_traefik
+      - kms_traefik
+      - open-grind_traefik
+      - paperless-ai_traefik
+      - qbittorrent_traefik
+      - send-bills_traefik
+      - unifi-network-application_traefik
     ports:
       - 80:80
       - 443:443
@@ -70,14 +81,35 @@ services:
       - IPV6_WG_SUBNET
 
 networks:
-  # Dedicated Browser Use ingress; Docker allocates the subnet automatically.
-  browser_use_proxy:
-    name: browser_use_proxy
-  authelia_proxy:
+  airflow_traefik:
     external: true
-  traefik_proxy:
+  authelia_traefik:
     external: true
-  loki_proxy:
+  backrest_traefik:
+    external: true
+  beszel_traefik:
+    external: true
+  browser-use_traefik:
+    external: true
+  grafana-loki_traefik:
+    external: true
+  grindr-api-dev-tool_traefik:
+    external: true
+  infra_traefik:
+    external: true
+  jellyfin_traefik:
+    external: true
+  kms_traefik:
+    external: true
+  open-grind_traefik:
+    external: true
+  paperless-ai_traefik:
+    external: true
+  qbittorrent_traefik:
+    external: true
+  send-bills_traefik:
+    external: true
+  unifi-network-application_traefik:
     external: true
 
 volumes:

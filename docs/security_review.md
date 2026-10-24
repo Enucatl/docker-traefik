@@ -10,22 +10,32 @@ Proton Mail Bridge; do not rely on Traefik middleware to protect them.
 
 Apply equivalent IPv4 and IPv6 rules and verify them from an untrusted VLAN.
 
-## Traefik network
+## Traefik networks
 
-Browser Use controller and noVNC use the dedicated `browser_use_proxy` network,
-owned by this Compose project. Only those two backends and Traefik join it;
-unrelated services must not join because the controller trusts identity headers
-from reachable peers. Docker allocates its subnet. Start this stack before
-Browser Use, which declares the network external.
+Each application stack owns a named `<stack>_traefik` ingress network. Traefik
+joins these networks as external networks; backends from different stacks no
+longer share an ingress bridge. Every ingress network enables IPv4 and IPv6.
+The infrastructure Compose project uses `infra_traefik` for IPA and Wolf.
 
-Only Traefik and processes receiving traffic from it join `traefik_proxy`.
-Worker, CLI, evaluation, and webhook processes use internal or dedicated
-egress networks instead. The Send Bills scheduler uses its `host_egress`
-network for SMTP access without joining the ingress network.
+Create the application networks before starting Traefik, for example with
+`docker compose create --no-build <ingress-service>` in each application stack.
+Traefik does not create or remove application networks.
 
-The short-lived qBittorrent initializer remains attached because it resolves
-Traefik's Docker-network address to generate qBittorrent's trusted-proxy
-allowlist. It exits before qBittorrent starts and exposes no listening service.
+Only ingress-facing services join their stack's ingress network, apart from
+existing stack-local workers that also use it for egress. Browser Use controller
+and noVNC use `browser-use_traefik`; the browser/CDP worker and database remain
+off that network because the controller trusts identity headers from reachable
+peers. Send Bills scheduler retains its separate `host_egress` network.
+
+The short-lived qBittorrent initializer joins `qbittorrent_traefik` to resolve
+Traefik's network addresses and generate qBittorrent's trusted-proxy allowlist.
+It exits before qBittorrent starts and exposes no listening service. Jellyfin's
+persistent trusted-proxy subnet must match `jellyfin_traefik` when that network
+is replaced.
+
+This isolates direct backend access between stacks. The `secured` middleware
+still permits Docker clients through Traefik; application authentication and
+mTLS continue to apply where configured.
 
 ## Forwarded client addresses
 
