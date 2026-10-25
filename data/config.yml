@@ -34,7 +34,7 @@ http:
       - https
       tls: {}
     traefik:
-      rule: Host(`traefik.atlas.home.arpa`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      rule: (Host(`traefik.atlas.home.arpa`) || Host(`traefik.atlas.intranet.enucatl.com`)) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       service: api@internal
       middlewares:
       - admin-rate-limit
@@ -42,7 +42,12 @@ http:
       - secured
       entryPoints:
       - https
-      tls: {}
+      tls:
+        certResolver: cloudflare
+        domains:
+          - main: atlas.intranet.enucatl.com
+            sans:
+              - '*.atlas.intranet.enucatl.com'
   middlewares:
     https-redirectscheme:
       redirectScheme:

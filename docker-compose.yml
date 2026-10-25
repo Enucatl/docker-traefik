@@ -69,8 +69,16 @@ services:
       - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro
       - /etc/ipa/ca.crt:/etc/ipa/ca.crt:ro
       - socket-proxy.run:/var/run
+      - type: bind
+        source: /var/lib/traefik/acme
+        target: /var/lib/traefik
+        bind:
+          create_host_path: false
+    secrets:
+      - cloudflare_dns_api_token
 
     environment:
+      - CF_DNS_API_TOKEN_FILE=/run/secrets/cloudflare_dns_api_token
       - LAN_SUBNET
       - TRUSTED_WIFI_SUBNET
       - CORTEX_SUBNET
@@ -114,3 +122,7 @@ networks:
 
 volumes:
   socket-proxy.run:
+
+secrets:
+  cloudflare_dns_api_token:
+    file: ./secrets/cloudflare_dns_api_token
