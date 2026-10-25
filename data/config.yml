@@ -34,7 +34,7 @@ http:
       - https
       tls: {}
     traefik:
-      rule: (Host(`traefik.atlas.home.arpa`) || Host(`traefik.atlas.intranet.enucatl.com`)) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      rule: (Host(`traefik.{{ env "DOCKER_DOMAIN" }}`) || Host(`traefik.{{ env "ACME_DOCKER_DOMAIN" }}`)) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       service: api@internal
       middlewares:
       - admin-rate-limit
@@ -45,9 +45,9 @@ http:
       tls:
         certResolver: cloudflare
         domains:
-          - main: atlas.intranet.enucatl.com
+          - main: '{{ env "ACME_DOCKER_DOMAIN" }}'
             sans:
-              - '*.atlas.intranet.enucatl.com'
+              - '*.{{ env "ACME_DOCKER_DOMAIN" }}'
   middlewares:
     https-redirectscheme:
       redirectScheme:

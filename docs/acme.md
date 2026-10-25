@@ -11,6 +11,14 @@ there is no planned removal or replacement of `home.arpa` in this work.
 
 ## Certificate and routing
 
+Shared `/opt/docker/.env` defines `DOMAIN` and `DOCKER_DOMAIN` for the existing
+private names, alongside `ACME_DOMAIN=intranet.enucatl.com` and
+`ACME_DOCKER_DOMAIN=atlas.${ACME_DOMAIN}` for publicly trusted certificate names.
+Compose interpolates these variables in service labels; Traefik and Authelia
+receive `ACME_DOCKER_DOMAIN` for their file-provider templates. The concrete
+hostnames below illustrate the current values. Restart affected containers after
+changing shared values so their environment matches the templates.
+
 The `cloudflare` resolver uses Traefik's built-in DNS-01 issuance and renewal,
 with explicit `EC256` (ECDSA P-256) keys. The dashboard router explicitly requests
 one certificate for `atlas.intranet.enucatl.com` and

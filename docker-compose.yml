@@ -91,6 +91,8 @@ services:
       - cloudflare_dns_api_token
 
     environment:
+      - DOCKER_DOMAIN
+      - ACME_DOCKER_DOMAIN
       - CF_DNS_API_TOKEN_FILE=/run/secrets/cloudflare_dns_api_token
       - CLOUDFLARE_PROPAGATION_TIMEOUT=1800
       - LAN_SUBNET

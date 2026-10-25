@@ -17,6 +17,10 @@ repo = Path("/repo")
 if sys.argv[1] == "prepare":
     static = (repo / "data/traefik.yml").read_text()
     dynamic = (repo / "data/config.yml").read_text()
+    dynamic = dynamic.replace('{{ env "DOCKER_DOMAIN" }}', "atlas.home.arpa")
+    dynamic = dynamic.replace(
+        '{{ env "ACME_DOCKER_DOMAIN" }}', "atlas.intranet.enucatl.com"
+    )
     assert "keyType: EC256" in static
     assert "provider: cloudflare" in static
     assert "disableANSChecks: true" in static
