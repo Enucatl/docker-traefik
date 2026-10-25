@@ -92,6 +92,7 @@ services:
 
     environment:
       - CF_DNS_API_TOKEN_FILE=/run/secrets/cloudflare_dns_api_token
+      - CLOUDFLARE_PROPAGATION_TIMEOUT=1800
       - LAN_SUBNET
       - TRUSTED_WIFI_SUBNET
       - CORTEX_SUBNET

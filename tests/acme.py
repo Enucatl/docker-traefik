@@ -19,6 +19,8 @@ if sys.argv[1] == "prepare":
     dynamic = (repo / "data/config.yml").read_text()
     assert "keyType: EC256" in static
     assert "provider: cloudflare" in static
+    assert "disableANSChecks: true" in static
+    assert "requireAllRNS: true" in static
     assert '"1.1.1.1:53"' in static and '"8.8.8.8:53"' in static
     assert "certResolver: cloudflare" in dynamic
     assert "- authelia@docker" in dynamic

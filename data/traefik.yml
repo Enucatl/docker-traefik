@@ -60,6 +60,10 @@ certificatesResolvers:
       keyType: EC256
       dnsChallenge:
         provider: cloudflare
+        propagation:
+          # Authoritative DNS over IPv6 is unreachable here; verify both public recursors.
+          disableANSChecks: true
+          requireAllRNS: true
         # Internal split DNS must not hide the public challenge records.
         resolvers:
           - "1.1.1.1:53"

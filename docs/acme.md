@@ -2,7 +2,8 @@
 
 This change is configuration preparation only. Do not restart production until
 the provisioning and migration steps below are complete. The Technitium candidate
-remains inactive. No public DNS changes or live issuance are part of local tests.
+remains inactive. Offline tests do not change public DNS. The separately authorized
+staging exercise below temporarily created public challenge TXT records.
 
 The new namespace is additive: `home.arpa` remains supported with its existing
 routes, DNS and Vault certificates. New names may point to the same services;
@@ -31,7 +32,7 @@ a backend transport and needs no hostname alias.
 ## Credentials and persistent state
 
 Create a dedicated Cloudflare API token with Zone / Zone / Read and Zone / DNS /
-Edit, restricted to the `enucatl.com` zone. Do not use the global API key or the
+Write (formerly Edit), restricted to the `enucatl.com` zone. Do not use the global API key or the
 router/DDNS token. Store only the raw token in the local, Git-ignored file
 `secrets/cloudflare_dns_api_token`. Compose exposes it as a read-only secret and passes
 `CF_DNS_API_TOKEN_FILE=/run/secrets/cloudflare_dns_api_token`. Do not put the token
@@ -77,9 +78,15 @@ A/AAAA records, inbound ACME ports, or delegation to Technitium are required.
 Traefik temporarily creates public TXT records at
 `_acme-challenge.atlas.intranet.enucatl.com` for both certificate identifiers.
 Public recursive resolvers `1.1.1.1:53` and `8.8.8.8:53` avoid split DNS during
-zone discovery and propagation checks. Checks remain enabled. Permit outbound
-DNS (UDP/TCP 53), HTTPS to Cloudflare and the CA, and authoritative DNS queries
-needed for propagation checks.
+zone discovery and propagation checks. Direct authoritative checks timed out on
+Cloudflare's IPv6 nameservers during staging. `disableANSChecks: true` avoids
+that path while `requireAllRNS: true` requires TXT propagation through both public
+recursive resolvers; propagation checks remain enabled. Permit outbound DNS
+(UDP/TCP 53) to those resolvers and HTTPS to Cloudflare and the CA. Revisit direct
+authoritative checks if authoritative IPv6 DNS connectivity is restored.
+`CLOUDFLARE_PROPAGATION_TIMEOUT=1800` permits up to 30 minutes for propagation,
+including cached negative TXT responses; the provider default of 120 seconds
+was too short during staging. Use the same environment variable for staging.
 
 Only the dashboard route is owned here; its alias retains all middleware.
 Docker-label routers in other stacks need their existing Host rule extended
@@ -141,8 +148,15 @@ over its lifetime. Stop/remove the test instance and temporary network afterward
 securely remove test state when no longer needed. Production uses the default
 Let's Encrypt directory with its own initially empty state, never staging state.
 
-Live Cloudflare issuance, CA key selection in an issued certificate, and scheduled
-renewal cannot be proven by static/local validation and remain deployment checks.
+On 2026-10-25, an isolated staging exercise passed with the deployed image and
+the dedicated token: Cloudflare DNS-01 issuance for both Atlas names, a staging
+issuer, ECDSA P-256 (`prime256v1`), exact/wildcard SNI selection and persistence
+across instance recreation. Temporary containers, state and token copies were
+removed; Traefik cleaned up its public challenge records. The original user-owned
+token received the documented read-only ACL for mapped host UID `101000`.
+
+Production issuance and scheduled renewal remain untested. No production service
+was restarted and no production certificate was requested.
 
 References: [Traefik ACME](https://doc.traefik.io/traefik/master/reference/install-configuration/tls/certificate-resolvers/acme/),
 [lego Cloudflare token permissions](https://go-acme.github.io/lego/dns/cloudflare/).
