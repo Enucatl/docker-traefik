@@ -26,6 +26,21 @@ services:
       - /var/run/docker.sock:/run/docker.sock:ro
       - socket-proxy.run:/run/proxy
 
+  acme-init:
+    image: ghcr.io/enucatl/traefik:latest
+    user: "0:0"
+    network_mode: none
+    read_only: true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - FOWNER
+    entrypoint: /bin/sh
+    command: ["-ec", "chown 1000:1000 /acme && chmod 0700 /acme"]
+    volumes:
+      - acme:/acme
+
   traefik:
     extends:
       file: ../compose-security-baseline/hardening.yml
@@ -42,6 +57,8 @@ services:
       retries: 3
       start_period: 10s
     depends_on:
+      acme-init:
+        condition: service_completed_successfully
       socket-proxy:
         condition: service_started
     networks:
@@ -69,11 +86,7 @@ services:
       - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro
       - /etc/ipa/ca.crt:/etc/ipa/ca.crt:ro
       - socket-proxy.run:/var/run
-      - type: bind
-        source: /var/lib/traefik/acme
-        target: /var/lib/traefik
-        bind:
-          create_host_path: false
+      - acme:/var/lib/traefik
     secrets:
       - cloudflare_dns_api_token
 
@@ -122,6 +135,7 @@ networks:
 
 volumes:
   socket-proxy.run:
+  acme:
 
 secrets:
   cloudflare_dns_api_token:

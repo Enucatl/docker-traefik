@@ -45,34 +45,24 @@ removes group and other access. Create the directory and token before Puppet
 applies these ACLs. Recompute the mapped UID if Docker's remapping changes.
 File-backed Compose secrets retain host ownership and permissions; Compose does
 not remap them through secret `uid`/`gid` settings. Create the local directory and
-file before starting Traefik. The ACME state bind mount refuses missing paths.
+file before starting Traefik.
 
-Provision `/var/lib/traefik/acme` as host `101000:101000`, mode `0700`, and an
-initial empty `acme.json` as that owner with mode `0600`. Never replace or truncate
-an existing file. This writable directory is outside the watched, read-only
-`/etc/traefik` configuration and separate from Puppet-managed PEM files. Puppet
-should manage directory permissions but must not enforce empty state-file
-contents on subsequent runs. Traefik owns state updates and renewal.
+ACME state uses the `acme` named volume at `/var/lib/traefik`. The `acme-init`
+service sets the directory owner to container `1000:1000` and mode `0700` before
+Traefik starts. Traefik creates `acme.json` with mode `0600` and owns updates
+and renewal. The initializer does not replace or truncate existing state.
 
 Back up the complete state securely (it contains private keys and the account),
 preferably with Traefik stopped for a consistent copy, and preserve `0600` on
-restore. Container recreation retains the bind-mounted state. Never share a
-state file between instances. Use separate staging and production directories
+restore. Container recreation retains the named volume. Never share a
+state file between instances. Use separate staging and production volumes
 and accounts; never copy staging state into production. Puppet `vault_cert`
 resources continue managing private and infrastructure certificates; ACME does
 not replace Vault PKI.
 
 The token is managed locally; no Puppet/Vault token provisioning is required.
-If managing ACME storage with `Enucatl/puppet-control-repo` (not applied here):
-
-1. Manage `/var/lib/traefik` and `/var/lib/traefik/acme` directories, the latter
-   owned by `101000:101000`, mode `0700`. Initialize the state with an `exec`
-   guarded by `creates => '/var/lib/traefik/acme/acme.json'`, running
-   `/usr/bin/install -o 101000 -g 101000 -m 0600 /dev/null /var/lib/traefik/acme/acme.json`
-   after the directory resource. Manage existing state permissions separately,
-   without a `content` or `source` attribute.
-2. Preserve `Vault_cert['atlas']`, current certificate ACLs, and
-   `trigger_traefik_reload`. Do not add this public certificate to `vault_cert`.
+Preserve `Vault_cert['atlas']`, current certificate ACLs, and
+`trigger_traefik_reload`. Do not add this public certificate to `vault_cert`.
 
 ## DNS and application migration
 
