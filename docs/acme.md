@@ -1,9 +1,11 @@
 # Cloudflare ACME preparation
 
-This change is configuration preparation only. Do not restart production until
-the provisioning and migration steps below are complete. The Technitium candidate
-remains inactive. Offline tests do not change public DNS. The separately authorized
-staging exercise below temporarily created public challenge TXT records.
+Production ACME issuance is active. On 2026-10-26 the live endpoint served a
+Let's Encrypt YE2 certificate for `atlas.intranet.enucatl.com` and
+`*.atlas.intranet.enucatl.com`, valid through 2027-01-23. Technitium now serves
+the mirrored internal names. Automated renewal has not yet been observed.
+Offline tests do not change public DNS; the separately authorized staging
+exercise below temporarily created public challenge TXT records.
 
 The new namespace is additive: `home.arpa` remains supported with its existing
 routes, DNS and Vault certificates. New names may point to the same services;
@@ -75,11 +77,9 @@ Preserve `Vault_cert['atlas']`, current certificate ACLs, and
 
 ## DNS and application migration
 
-In Technitium's internal authoritative `intranet.enucatl.com` zone, create
-`atlas` A/AAAA records for Traefik's reachable private IPv4/IPv6 addresses and
-either `*.atlas` A/AAAA records or explicit service records (including
-`traefik.atlas`, `jellyfin.atlas`, etc.). Publish only addresses reachable by
-those clients. Retain the existing `home.arpa` zone and records alongside it.
+Technitium's internal `intranet.enucatl.com` zone mirrors `home.arpa` through
+an apex DNAME, including Atlas and its wildcard service names. Keep the existing
+`home.arpa` zone, identities and URLs. No duplicate address records are needed.
 
 Cloudflare remains publicly authoritative for `enucatl.com`. No public service
 A/AAAA records, inbound ACME ports, or delegation to Technitium are required.
@@ -107,15 +107,13 @@ WebSocket origins and OAuth/OIDC callback registrations. A certificate alone
 does not migrate an application. Services terminating TLS outside Traefik need
 their own certificate-delivery arrangement; none is introduced here.
 
-Concrete companion files include `authelia/config/configuration.yml` (add a
-cookie entry for `atlas.intranet.enucatl.com`, the new Authelia URL and redirects;
-mirror specific policies before the wildcard; review Jellyfin/Grafana/Beszel
-OIDC callbacks and issuer identifiers) and `authelia/docker-compose.yml` (login
-route alias). `jellyfin/docker-compose.yml` hardcodes the old domain in two
-routers; `grafana-loki/docker-compose.yml` and `beszel/docker-compose.yml` use
-`${DOCKER_DOMAIN}`. Add aliases rather than replacing that variable globally,
-which would remove old URLs and change application settings. Audit the other
-stacks' Docker labels similarly before their migration.
+Authelia now serves both portal hostnames with separate cookies and matching
+access policies. Jellyfin supports both hostnames and uses the publicly trusted
+Authelia endpoint; its two callback URLs remain registered. Grafana and Beszel
+retain their existing `home.arpa` issuers and callbacks, verified through their
+authorization starts. Migrating those applications' own URLs is optional and
+separate; preserve old aliases if adding new ones. Interactive account login
+was not exercised during the automated 2026-10-26 checks.
 
 ## Local verification
 
@@ -163,8 +161,9 @@ across instance recreation. Temporary containers, state and token copies were
 removed; Traefik cleaned up its public challenge records. The original user-owned
 token received the documented read-only ACL for mapped host UID `101000`.
 
-Production issuance and scheduled renewal remain untested. No production service
-was restarted and no production certificate was requested.
+The staging exercise above preceded production activation. Production issuance
+has since been confirmed on the live endpoint; scheduled renewal has not yet
+been observed.
 
 References: [Traefik ACME](https://doc.traefik.io/traefik/master/reference/install-configuration/tls/certificate-resolvers/acme/),
 [lego Cloudflare token permissions](https://go-acme.github.io/lego/dns/cloudflare/).
