@@ -62,21 +62,23 @@ services:
       socket-proxy:
         condition: service_started
     networks:
-      - airflow_traefik
-      - authelia_traefik
-      - backrest_traefik
-      - beszel_traefik
-      - browser-use_traefik
-      - grafana-loki_traefik
-      - grindr-api-dev-tool_traefik
-      - infra_traefik
-      - jellyfin_traefik
-      - kms_traefik
-      - open-grind_traefik
-      - paperless-ai_traefik
-      - qbittorrent_traefik
-      - send-bills_traefik
-      - unifi-network-application_traefik
+      airflow_traefik:
+      authelia_traefik:
+      backrest_traefik:
+      beszel_traefik:
+      browser-use_traefik:
+      grafana-loki_traefik:
+      grindr-api-dev-tool_traefik:
+      infra_traefik:
+      jellyfin_traefik:
+      kms_traefik:
+      open-grind_traefik:
+      paperless-ai_traefik:
+      qbittorrent_traefik:
+        ipv4_address: 172.18.160.3
+        ipv6_address: 2a02:168:6278:a415::3
+      send-bills_traefik:
+      unifi-network-application_traefik:
     ports:
       - 80:80
       - 443:443
